@@ -4,19 +4,28 @@
 
 CONFIG_DIR="/etc/flykod-server"
 CURRENT_DOMAIN_FILE="$CONFIG_DIR/current_domain"
-SITES_DIR="/var/www/sites"
+SITE_ROOT="/var/www/html"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Flykod green #00F10A (RGB 0, 241, 10) - ANSI 24-bit
+GREEN='\033[38;2;0;241;10m'
+RESET='\033[0m'
 
 show_logo() {
   echo ""
-  echo "   __ _       _             _ "
+  echo -e "${GREEN}   __ _       _             _ "
   echo "  / _| |     | |           | |"
   echo " | |_| |_   _| | _____   __| |"
   echo " |  _| | | | | |/ / _ \ / _\` |"
   echo " | | | | |_| |   < (_) | (_| |"
   echo " |_| |_|\__, |_|\_\___/ \__,_|"
   echo "         __/ |                "
-  echo "        |___/                 "
+  echo "        |___/                 ${RESET}"
+  echo ""
+}
+
+show_greeting() {
+  echo "Welcome. This server is ready for a single WordPress site."
+  echo "Flykod: https://flykod.com/"
   echo ""
 }
 
@@ -42,56 +51,41 @@ check_firewall() {
 show_checklist() {
   echo "--- Checklist ---"
   if [ "$(check_stack)" = "yes" ]; then
-    echo "  [done] Stack (Nginx, PHP, MariaDB, Certbot)"
+    echo "  [ ✓ ] - Stack (Nginx, PHP, MariaDB, Certbot)"
   else
-    echo "  [ ---- ] Stack (Nginx, PHP, MariaDB, Certbot)"
+    echo "  [   ] - Stack (Nginx, PHP, MariaDB, Certbot)"
   fi
   if [ "$(check_firewall)" = "yes" ]; then
-    echo "  [done] Firewall (UFW)"
+    echo "  [ ✓ ] - Firewall (UFW)"
   else
-    echo "  [ ---- ] Firewall (UFW)"
+    echo "  [   ] - Firewall (UFW)"
   fi
-  local site_count=0
-  local wp_count=0
-  if [ -d "$SITES_DIR" ]; then
-    for dir in "$SITES_DIR"/*/; do
-      [ -d "$dir" ] && site_count=$((site_count + 1))
-      [ -f "${dir}wp-config.php" ] && wp_count=$((wp_count + 1))
-    done
-  fi
-  if [ "$site_count" -gt 0 ]; then
-    echo "  [done] Create site ($site_count site(s))"
+  if [ -f "$CURRENT_DOMAIN_FILE" ]; then
+    echo "  [ ✓ ] - Create site"
   else
-    echo "  [ ---- ] Create site"
+    echo "  [   ] - Create site"
   fi
-  if [ "$wp_count" -gt 0 ]; then
-    echo "  [done] WordPress ($wp_count site(s) with WP)"
+  if [ -f "$SITE_ROOT/wp-config.php" ]; then
+    echo "  [ ✓ ] - WordPress"
   else
-    echo "  [ ---- ] WordPress"
+    echo "  [   ] - WordPress"
   fi
   echo ""
 }
 
 show_info() {
   echo "This machine is a WordPress server (Nginx + PHP + MariaDB)."
-  echo "Sites live under: $SITES_DIR"
+  echo "Site root: $SITE_ROOT"
   echo ""
   echo "--- Server IP (use when domain is not pointed yet) ---"
   ip -4 addr show scope global 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' || echo "Could not detect IP."
   echo ""
   if [ -f "$CURRENT_DOMAIN_FILE" ]; then
     CURRENT=$(cat "$CURRENT_DOMAIN_FILE")
-    echo "--- Default site for IP access ---"
+    echo "--- Domain / IP access ---"
     echo "  Domain: $CURRENT"
+    echo "  (IP also serves this site when using --dev)"
     echo ""
-  fi
-  echo "--- Sites on this server ---"
-  if [ -d "$SITES_DIR" ] && [ -n "$(ls -A $SITES_DIR 2>/dev/null)" ]; then
-    for dir in "$SITES_DIR"/*/; do
-      [ -d "$dir" ] && echo "  - $(basename "$dir")"
-    done
-  else
-    echo "  (none yet)"
   fi
   echo ""
 }
@@ -115,6 +109,7 @@ main_menu() {
   while true; do
     clear
     show_logo
+    show_greeting
     show_info
     show_checklist
     echo "--- Actions ---"
@@ -167,13 +162,7 @@ main_menu() {
         prompt_continue
         ;;
       5)
-        read -p "Domain (same as in create-site): " domain
-        if [ -z "$domain" ]; then
-          echo "Domain required."
-          prompt_continue
-          continue
-        fi
-        run_script "install-wordpress.sh" "$domain"
+        run_script "install-wordpress.sh"
         prompt_continue
         ;;
       *)

@@ -1,7 +1,6 @@
 #!/bin/bash
 
-DOMAIN=$1
-WEBROOT="/var/www/sites/$DOMAIN"
+WEBROOT="/var/www/html"
 
 echo "Downloading WordPress..."
 
@@ -11,8 +10,8 @@ tar -xvf latest.tar.gz
 
 echo "Moving files..."
 
-cp -R wordpress/* $WEBROOT
+cp -R wordpress/* "$WEBROOT"
 
-chown -R www-data:www-data $WEBROOT
+chown -R www-data:www-data "$WEBROOT"
 
 echo "WordPress installed in $WEBROOT"

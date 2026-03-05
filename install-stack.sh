@@ -25,12 +25,12 @@ apt install -y mariadb-server mariadb-client
 echo "Installing Certbot..."
 apt install -y certbot python3-certbot-nginx
 
-echo "Creating sites directory..."
-mkdir -p /var/www/sites
+echo "Ensuring site root exists..."
+mkdir -p /var/www/html
 
 echo "Setting permissions..."
-chown -R www-data:www-data /var/www/sites
-chmod -R 755 /var/www/sites
+chown -R www-data:www-data /var/www/html
+chmod -R 755 /var/www/html
 
 echo "Enabling services..."
 systemctl enable nginx

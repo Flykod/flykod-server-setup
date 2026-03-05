@@ -6,7 +6,7 @@
 
 Scripts for bootstrapping WordPress servers on DigitalOcean droplets.
 
-This project automates the installation of the stack needed to run WordPress sites:
+This project automates the installation of the stack needed to run a single WordPress site:
 
 - Nginx
 - PHP 8.3
@@ -31,7 +31,7 @@ Shows the **Flykod logo**, server info (IP, sites), and an **interactive menu**:
 - **2** – Configure firewall  
 - **3** – Create site (prompts for domain and dev mode **y/n**)  
 - **4** – Change domain (prompts for old and new domain)  
-- **5** – Install WordPress (prompts for domain)
+- **5** – Install WordPress (into /var/www/html)
 
 After each action you can press Enter and choose another option or exit.
 
@@ -47,9 +47,9 @@ After each action you can press Enter and choose another option or exit.
 | **flykod** | Launcher: run `flykod start` from anywhere (after linking to `/usr/local/bin`). |
 | **welcome.sh** | Server overview and command list. Run when you need a reminder. |
 | **install-stack.sh** | Installs Nginx, PHP, MariaDB and dependencies. |
-| **create-site.sh** | Creates the Nginx virtual host and site directory. |
+| **create-site.sh** | Creates the Nginx virtual host for the domain (root: /var/www/html). |
 | **change-domain.sh** | Changes a site’s domain (e.g. dev → production). |
-| **install-wordpress.sh** | Downloads and installs WordPress into the site. |
+| **install-wordpress.sh** | Downloads and installs WordPress into /var/www/html. |
 | **firewall.sh** | Configures the firewall (UFW). |
 
 ---
@@ -112,10 +112,10 @@ bash create-site.sh 123.example.com --dev
 ### 3. Install WordPress
 
 ```bash
-bash install-wordpress.sh example.com
+bash install-wordpress.sh
 ```
 
-(Use the same domain you passed to `create-site.sh`.)
+(Installs into /var/www/html.)
 
 ### 4. Change the domain later (e.g. dev → production)
 
@@ -139,16 +139,13 @@ The script updates Nginx and requests an SSL certificate for the new domain. **Y
 
 ## Site layout on the server
 
-Sites live under:
+Single site; document root (world standard):
 
 ```
-/var/www/sites
+/var/www/html
 ```
 
-Examples:
-
-- `/var/www/sites/client1.com`
-- `/var/www/sites/123.example.com` (after `change-domain` it can respond as `example.com`; the directory name stays the same)
+The same folder is used for the site at every step; only the domain (Nginx `server_name`) changes when you run `change-domain.sh`.
 
 ---
 
@@ -160,7 +157,7 @@ bash welcome.sh                                    # Open menu from repo directo
 bash create-site.sh domain.com                     # Site with SSL (domain already pointed)
 bash create-site.sh dev.domain.com --dev           # Site without SSL, accessible by IP
 bash change-domain.sh old.com new.com              # Change site domain
-bash install-wordpress.sh domain.com               # Install WordPress
+bash install-wordpress.sh                          # Install WordPress into /var/www/html
 bash firewall.sh                                   # Configure firewall
 ```
 

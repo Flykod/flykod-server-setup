@@ -6,7 +6,7 @@ for arg in "$@"; do
   [ "$arg" = "--dev" ] && DEV_MODE=1
 done
 
-WEBROOT="/var/www/sites/$DOMAIN"
+WEBROOT="/var/www/html"
 CONFIG_DIR="/etc/flykod-server"
 CURRENT_DOMAIN_FILE="$CONFIG_DIR/current_domain"
 CURRENT_WEBROOT_FILE="$CONFIG_DIR/current_webroot"
@@ -18,13 +18,13 @@ if [ -z "$DOMAIN" ]; then
   exit 1
 fi
 
-echo "Creating directory for $DOMAIN..."
+echo "Configuring site for $DOMAIN (root: $WEBROOT)..."
 
-mkdir -p $WEBROOT
+mkdir -p "$WEBROOT"
 mkdir -p "$CONFIG_DIR"
 
-chown -R www-data:www-data $WEBROOT
-chmod -R 755 $WEBROOT
+chown -R www-data:www-data "$WEBROOT"
+chmod -R 755 "$WEBROOT"
 
 echo "Creating Nginx config..."
 
@@ -85,12 +85,12 @@ if [ $DEV_MODE -eq 1 ]; then
 
   # Default server for IP access (when domain is not pointed yet)
   cat > "$NGINX_IP_DEFAULT" <<EOL
-# Serves the current dev site when accessing by server IP.
+# Serves the site when accessing by server IP (single site: /var/www/html).
 # Updated by create-site.sh --dev and change-domain.sh
 server {
     listen 80 default_server;
     server_name _;
-    root $WEBROOT;
+    root /var/www/html;
     index index.php index.html;
 
     location / {

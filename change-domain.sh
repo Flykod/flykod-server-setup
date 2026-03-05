@@ -6,7 +6,7 @@ OLD_DOMAIN=$1
 NEW_DOMAIN=$2
 CONFIG_DIR="/etc/flykod-server"
 CURRENT_DOMAIN_FILE="$CONFIG_DIR/current_domain"
-WEBROOT="/var/www/sites/$OLD_DOMAIN"
+WEBROOT="/var/www/html"
 NGINX_AVAILABLE="/etc/nginx/sites-available"
 NGINX_ENABLED="/etc/nginx/sites-enabled"
 
@@ -17,7 +17,7 @@ if [ -z "$OLD_DOMAIN" ] || [ -z "$NEW_DOMAIN" ]; then
 fi
 
 if [ ! -d "$WEBROOT" ]; then
-  echo "Error: Site directory not found: $WEBROOT"
+  echo "Error: Site root not found: $WEBROOT"
   exit 1
 fi
 
