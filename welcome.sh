@@ -8,6 +8,7 @@ SITE_ROOT="/var/www/html"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Flykod green #00F10A (RGB 0, 241, 10) - ANSI 24-bit
 GREEN='\033[38;2;0;241;10m'
+UL='\033[4m'
 RESET='\033[0m'
 
 show_logo() {
@@ -24,12 +25,13 @@ show_logo() {
 }
 
 show_greeting() {
-  echo "Powered by Flykod · https://flykod.com"
+  echo -e "Powered by Flykod · ${GREEN}${UL}https://flykod.com${RESET}"
   echo ""
   echo ""
   echo "===================================================================================="
   echo ""
   echo "WELCOME!"
+  echo ""
   echo "This server is set up for one WordPress site — use the menu below to get started."
   echo ""
   echo "===================================================================================="
@@ -60,22 +62,22 @@ check_firewall() {
 show_checklist() {
   echo "--- Checklist ---"
   if [ "$(check_stack)" = "yes" ]; then
-    echo "  [ ✓ ] - Stack (Nginx, PHP, MariaDB, Certbot)"
+    echo -e "  [ ${GREEN}✓${RESET} ] - Stack (Nginx, PHP, MariaDB, Certbot)"
   else
     echo "  [   ] - Stack (Nginx, PHP, MariaDB, Certbot)"
   fi
   if [ "$(check_firewall)" = "yes" ]; then
-    echo "  [ ✓ ] - Firewall (UFW)"
+    echo -e "  [ ${GREEN}✓${RESET} ] - Firewall (UFW)"
   else
     echo "  [   ] - Firewall (UFW)"
   fi
   if [ -f "$CURRENT_DOMAIN_FILE" ]; then
-    echo "  [ ✓ ] - Create site"
+    echo -e "  [ ${GREEN}✓${RESET} ] - Create site"
   else
     echo "  [   ] - Create site"
   fi
   if [ -f "$SITE_ROOT/wp-login.php" ] || [ -f "$SITE_ROOT/wp-config.php" ]; then
-    echo "  [ ✓ ] - WordPress"
+    echo -e "  [ ${GREEN}✓${RESET} ] - WordPress"
   else
     echo "  [   ] - WordPress"
   fi
@@ -89,7 +91,7 @@ show_info() {
   echo "--- Server IP (use when domain is not pointed yet) ---"
   PUBLIC_IP=$(ip -4 addr show scope global 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -vE '^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\.|^192\.168\.' | head -1)
   if [ -n "$PUBLIC_IP" ]; then
-    echo "  Public: $PUBLIC_IP"
+    echo -e "  Public: ${GREEN}${PUBLIC_IP}${RESET}"
   else
     echo "  Could not detect public IP."
   fi
@@ -97,7 +99,7 @@ show_info() {
   if [ -f "$CURRENT_DOMAIN_FILE" ]; then
     CURRENT=$(cat "$CURRENT_DOMAIN_FILE")
     echo "--- Domain / IP access ---"
-    echo "  Domain: $CURRENT"
+    echo -e "  Domain: ${GREEN}${UL}${CURRENT}${RESET}"
     echo "  Domain not pointed yet — use the Public IP above to access the site."
     echo ""
   fi
