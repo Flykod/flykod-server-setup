@@ -20,6 +20,58 @@ show_logo() {
   echo ""
 }
 
+check_stack() {
+  if command -v nginx &>/dev/null && systemctl is-active --quiet nginx 2>/dev/null \
+     && (systemctl is-active --quiet php8.3-fpm 2>/dev/null || systemctl is-active --quiet php*-fpm 2>/dev/null) \
+     && (systemctl is-active --quiet mariadb 2>/dev/null || systemctl is-active --quiet mysql 2>/dev/null) \
+     && command -v certbot &>/dev/null; then
+    echo "yes"
+  else
+    echo "no"
+  fi
+}
+
+check_firewall() {
+  if command -v ufw &>/dev/null && ufw status 2>/dev/null | grep -q "Status: active"; then
+    echo "yes"
+  else
+    echo "no"
+  fi
+}
+
+show_checklist() {
+  echo "--- Checklist ---"
+  if [ "$(check_stack)" = "yes" ]; then
+    echo "  [done] Stack (Nginx, PHP, MariaDB, Certbot)"
+  else
+    echo "  [ ---- ] Stack (Nginx, PHP, MariaDB, Certbot)"
+  fi
+  if [ "$(check_firewall)" = "yes" ]; then
+    echo "  [done] Firewall (UFW)"
+  else
+    echo "  [ ---- ] Firewall (UFW)"
+  fi
+  local site_count=0
+  local wp_count=0
+  if [ -d "$SITES_DIR" ]; then
+    for dir in "$SITES_DIR"/*/; do
+      [ -d "$dir" ] && site_count=$((site_count + 1))
+      [ -f "${dir}wp-config.php" ] && wp_count=$((wp_count + 1))
+    done
+  fi
+  if [ "$site_count" -gt 0 ]; then
+    echo "  [done] Create site ($site_count site(s))"
+  else
+    echo "  [ ---- ] Create site"
+  fi
+  if [ "$wp_count" -gt 0 ]; then
+    echo "  [done] WordPress ($wp_count site(s) with WP)"
+  else
+    echo "  [ ---- ] WordPress"
+  fi
+  echo ""
+}
+
 show_info() {
   echo "This machine is a WordPress server (Nginx + PHP + MariaDB)."
   echo "Sites live under: $SITES_DIR"
@@ -64,6 +116,7 @@ main_menu() {
     clear
     show_logo
     show_info
+    show_checklist
     echo "--- Actions ---"
     echo "  0) Exit"
     echo "  1) Install stack (Nginx, PHP, MariaDB, Certbot)"
