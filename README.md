@@ -29,9 +29,11 @@ Shows the **Flykod logo**, greeting (Powered by Flykod), server info (public IP,
 - **0** – Exit  
 - **1** – Install stack (Nginx, PHP, MariaDB, Certbot)  
 - **2** – Configure firewall  
-- **3** – Create site (prompts for domain and dev mode **y/n**)  
-- **4** – Change domain (prompts for old and new domain)  
-- **5** – Install WordPress (into /var/www/html)
+- **3** – Create database (local DB + user + generated password; skip if using external DB)  
+- **4** – Create site (prompts for domain and dev mode **y/n**)  
+- **5** – Install WordPress (into /var/www/html)  
+- **6** – Change domain (prompts for old and new domain)  
+- **7** – Show database password (view stored credentials again)
 
 After each action you can press Enter and choose another option or exit.
 
@@ -44,11 +46,12 @@ After each action you can press Enter and choose another option or exit.
 
 | Script | Description |
 |--------|-------------|
-| **flykod** | Launcher: run `flykod start` from anywhere (after linking to `/usr/local/bin`). |
 | **welcome.sh** | Server overview and command list. Run when you need a reminder. |
 | **install-stack.sh** | Installs Nginx, PHP, MariaDB and dependencies. |
 | **create-site.sh** | Creates the Nginx virtual host for the domain (root: /var/www/html). |
 | **change-domain.sh** | Changes a site’s domain (e.g. dev → production). |
+| **create-database.sh** | Creates a local MariaDB database and user with a generated password; stores credentials. |
+| **show-db-password.sh** | Displays stored database credentials (e.g. if you lost the password). |
 | **install-wordpress.sh** | Downloads and installs WordPress into /var/www/html. |
 | **firewall.sh** | Configures the firewall (UFW). |
 
@@ -75,17 +78,13 @@ bash install-stack.sh
 bash firewall.sh
 ```
 
-**Optional — use `flykod start` from anywhere:** after cloning, run once (from inside the repo):
+### 2. Create the database (optional)
 
-```bash
-sudo ln -sf $(pwd)/flykod /usr/local/bin/flykod
-```
+From the menu: choose **3** (Create database) to create a local MariaDB database and user with an auto-generated password. Credentials are shown once and stored; use **7** (Show database password) to see them again. If you use an **external database**, skip this and enter your existing DB host, name, user and password when WordPress asks during installation.
 
-Then from any directory: `flykod start` to open the menu.
+### 3. Create the site
 
-### 2. Create the site
-
-From the menu: choose **3**, enter the domain, then answer **y/n** for dev mode (use **y** if the domain is not pointed yet so you can access the site by IP).
+From the menu: choose **4**, enter the domain, then answer **y/n** for dev mode (use **y** if the domain is not pointed yet so you can access the site by IP).
 
 Or from the terminal:
 
@@ -103,9 +102,9 @@ bash create-site.sh 123.example.com --dev
 
 The site is then available at `http://<PUBLIC_IP>`. The menu will show “Domain not pointed yet — use the Public IP above to access the site.” When the domain is pointed, use **Change domain** (step 4) or request SSL.
 
-### 3. Install WordPress
+### 4. Install WordPress
 
-From the menu: choose **5**.
+From the menu: choose **5** (use the database credentials from step 2 when WordPress asks).
 
 Or from the terminal:
 
@@ -115,9 +114,9 @@ bash install-wordpress.sh
 
 (Installs into /var/www/html.)
 
-### 4. Change the domain later (e.g. dev → production)
+### 5. Change the domain later (e.g. dev → production)
 
-From the menu: choose **4**, then enter the current domain and the new domain.
+From the menu: choose **6**, then enter the current domain and the new domain.
 
 Or from the terminal (e.g. dev `123.example.com` → production `example.com`):
 
@@ -152,10 +151,11 @@ The same folder is used for the site at every step; only the domain (Nginx `serv
 ## Command summary
 
 ```bash
-flykod start                                       # Open menu (if linked: sudo ln -sf $(pwd)/flykod /usr/local/bin/flykod)
-bash welcome.sh                                    # Open menu from repo directory
+bash welcome.sh                                    # Open menu (from repo directory)
 bash create-site.sh domain.com                     # Site with SSL (domain already pointed)
 bash create-site.sh dev.domain.com --dev           # Site without SSL, accessible by IP
+bash create-database.sh                            # Create local DB + user (password generated)
+bash show-db-password.sh                           # Show stored DB credentials again
 bash change-domain.sh old.com new.com              # Change site domain
 bash install-wordpress.sh                          # Install WordPress into /var/www/html
 bash firewall.sh                                   # Configure firewall

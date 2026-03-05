@@ -4,6 +4,7 @@
 
 CONFIG_DIR="/etc/flykod-server"
 CURRENT_DOMAIN_FILE="$CONFIG_DIR/current_domain"
+CREDENTIALS_FILE="$CONFIG_DIR/db-credentials"
 SITE_ROOT="/var/www/html"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Flykod green #00F10A (RGB 0, 241, 10) - ANSI 24-bit
@@ -76,6 +77,11 @@ show_checklist() {
   else
     echo "  [   ] - Create site"
   fi
+  if [ -f "$CREDENTIALS_FILE" ]; then
+    echo -e "  [ ${GREEN}✓${RESET} ] - Database (local)"
+  else
+    echo "  [   ] - Database (skip if using external DB)"
+  fi
   if [ -f "$SITE_ROOT/wp-login.php" ] || [ -f "$SITE_ROOT/wp-config.php" ]; then
     echo -e "  [ ${GREEN}✓${RESET} ] - WordPress"
   else
@@ -132,11 +138,13 @@ main_menu() {
     echo "  0) Exit"
     echo "  1) Install stack (Nginx, PHP, MariaDB, Certbot)"
     echo "  2) Configure firewall"
-    echo "  3) Create site"
-    echo "  4) Change domain"
+    echo "  3) Create database (local; skip if using external DB)"
+    echo "  4) Create site"
     echo "  5) Install WordPress"
+    echo "  6) Change domain"
+    echo "  7) Show database password"
     echo ""
-    read -p "Choice [0-5]: " choice
+    read -p "Choice [0-7]: " choice
 
     case "$choice" in
       0)
@@ -152,6 +160,10 @@ main_menu() {
         prompt_continue
         ;;
       3)
+        run_script "create-database.sh"
+        prompt_continue
+        ;;
+      4)
         read -p "Domain (e.g. example.com or dev.example.com): " domain
         if [ -z "$domain" ]; then
           echo "Domain required."
@@ -166,7 +178,11 @@ main_menu() {
         fi
         prompt_continue
         ;;
-      4)
+      5)
+        run_script "install-wordpress.sh"
+        prompt_continue
+        ;;
+      6)
         read -p "Current domain: " old_domain
         read -p "New domain: " new_domain
         if [ -z "$old_domain" ] || [ -z "$new_domain" ]; then
@@ -177,12 +193,12 @@ main_menu() {
         run_script "change-domain.sh" "$old_domain $new_domain"
         prompt_continue
         ;;
-      5)
-        run_script "install-wordpress.sh"
+      7)
+        run_script "show-db-password.sh"
         prompt_continue
         ;;
       *)
-        echo "Invalid option. Use 0-5."
+        echo "Invalid option. Use 0-7."
         prompt_continue
         ;;
     esac
