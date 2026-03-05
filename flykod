@@ -1,0 +1,22 @@
+#!/bin/bash
+# Flykod launcher - run "flykod start" from anywhere after linking to /usr/local/bin.
+
+case "${1:-}" in
+  start)
+    REPO_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+    if [ -x "$REPO_DIR/welcome.sh" ]; then
+      exec bash "$REPO_DIR/welcome.sh"
+    else
+      echo "flykod: welcome.sh not found (run from flykod-server-setup or fix symlink)."
+      exit 1
+    fi
+    ;;
+  *)
+    echo "Usage: flykod start"
+    echo "  Opens the Flykod server setup menu (welcome.sh)."
+    echo ""
+    echo "To enable from anywhere, run once from the cloned repo:"
+    echo "  sudo ln -sf \$(pwd)/flykod /usr/local/bin/flykod"
+    exit 0
+    ;;
+esac

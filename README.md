@@ -44,6 +44,7 @@ After each action you can press Enter and choose another option or exit.
 
 | Script | Description |
 |--------|-------------|
+| **flykod** | Launcher: run `flykod start` from anywhere (after linking to `/usr/local/bin`). |
 | **welcome.sh** | Server overview and command list. Run when you need a reminder. |
 | **install-stack.sh** | Installs Nginx, PHP, MariaDB and dependencies. |
 | **create-site.sh** | Creates the Nginx virtual host and site directory. |
@@ -57,7 +58,25 @@ After each action you can press Enter and choose another option or exit.
 
 ### 1. Prepare the server
 
-Create an Ubuntu droplet on DigitalOcean, connect via SSH and clone:
+Create an Ubuntu droplet on DigitalOcean, connect via SSH, then run (clone + open menu in one command):
+
+```bash
+git clone https://github.com/flykod/flykod-server-setup && cd flykod-server-setup && bash welcome.sh
+```
+
+**Optional — use `flykod start` from anywhere:** after cloning, run once (from inside the repo):
+
+```bash
+sudo ln -sf $(pwd)/flykod /usr/local/bin/flykod
+```
+
+Then from any directory you can open the menu with:
+
+```bash
+flykod start
+```
+
+Or step by step (clone only):
 
 ```bash
 ssh root@SERVER_IP
@@ -136,7 +155,8 @@ Examples:
 ## Command summary
 
 ```bash
-bash welcome.sh                                    # See what this machine is and list commands
+flykod start                                       # Open menu (if linked: sudo ln -sf $(pwd)/flykod /usr/local/bin/flykod)
+bash welcome.sh                                    # Open menu from repo directory
 bash create-site.sh domain.com                     # Site with SSL (domain already pointed)
 bash create-site.sh dev.domain.com --dev           # Site without SSL, accessible by IP
 bash change-domain.sh old.com new.com              # Change site domain
