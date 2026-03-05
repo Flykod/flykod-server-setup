@@ -27,10 +27,12 @@ show_greeting() {
   echo "Powered by Flykod · https://flykod.com"
   echo ""
   echo ""
-  echo "================================================"
+  echo "===================================================================================="
+  echo ""
   echo "WELCOME!"
   echo "This server is set up for one WordPress site — use the menu below to get started."
-  echo "================================================"
+  echo ""
+  echo "===================================================================================="
 }
 
 check_stack() {
