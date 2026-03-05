@@ -24,7 +24,7 @@ Run on the server:
 bash welcome.sh
 ```
 
-Shows the **Flykod logo**, server info (IP, sites), and an **interactive menu**:
+Shows the **Flykod logo**, greeting (Powered by Flykod), server info (public IP, site root, domain when set), a **checklist** of completed steps, and an **interactive menu**:
 
 - **0** – Exit  
 - **1** – Install stack (Nginx, PHP, MariaDB, Certbot)  
@@ -56,6 +56,8 @@ After each action you can press Enter and choose another option or exit.
 
 ## Usage flow
 
+All steps can be done from the **interactive menu** (welcome.sh); the commands below are the same actions if you prefer running them directly in the terminal.
+
 ### 1. Prepare the server
 
 Create an Ubuntu droplet on DigitalOcean, connect via SSH, then run (clone + open menu in one command):
@@ -64,35 +66,28 @@ Create an Ubuntu droplet on DigitalOcean, connect via SSH, then run (clone + ope
 git clone https://github.com/flykod/flykod-server-setup && cd flykod-server-setup && bash welcome.sh
 ```
 
-**Optional — use `flykod start` from anywhere:** after cloning, run once (from inside the repo):
+From the menu: choose **1** (Install stack), then **2** (Configure firewall). The checklist will show each step as done.
 
-```bash
-sudo ln -sf $(pwd)/flykod /usr/local/bin/flykod
-```
-
-Then from any directory you can open the menu with:
-
-```bash
-flykod start
-```
-
-Or step by step (clone only):
-
-```bash
-ssh root@SERVER_IP
-git clone https://github.com/flykod/flykod-server-setup
-cd flykod-server-setup
-bash welcome.sh
-```
-
-Install stack and firewall:
+Or run from the repo directory:
 
 ```bash
 bash install-stack.sh
 bash firewall.sh
 ```
 
+**Optional — use `flykod start` from anywhere:** after cloning, run once (from inside the repo):
+
+```bash
+sudo ln -sf $(pwd)/flykod /usr/local/bin/flykod
+```
+
+Then from any directory: `flykod start` to open the menu.
+
 ### 2. Create the site
+
+From the menu: choose **3**, enter the domain, then answer **y/n** for dev mode (use **y** if the domain is not pointed yet so you can access the site by IP).
+
+Or from the terminal:
 
 **If the domain already points to the server** (production):
 
@@ -100,16 +95,19 @@ bash firewall.sh
 bash create-site.sh example.com
 ```
 
-**If the domain is not pointed yet** (development): use `--dev` to create the site and access it **by IP** until DNS is correct:
+**If the domain is not pointed yet** (development): use `--dev` to access the site **by public IP** until DNS is correct:
 
 ```bash
 bash create-site.sh 123.example.com --dev
 ```
 
-- The site is available at `http://<SERVER_IP>`.
-- When the domain is pointed, you can request SSL or switch to the final domain (see below).
+The site is then available at `http://<PUBLIC_IP>`. The menu will show “Domain not pointed yet — use the Public IP above to access the site.” When the domain is pointed, use **Change domain** (step 4) or request SSL.
 
 ### 3. Install WordPress
+
+From the menu: choose **5**.
+
+Or from the terminal:
 
 ```bash
 bash install-wordpress.sh
@@ -119,7 +117,9 @@ bash install-wordpress.sh
 
 ### 4. Change the domain later (e.g. dev → production)
 
-Example: in dev you used `123.example.com` and in production you want `example.com`.
+From the menu: choose **4**, then enter the current domain and the new domain.
+
+Or from the terminal (e.g. dev `123.example.com` → production `example.com`):
 
 ```bash
 bash change-domain.sh 123.example.com example.com
