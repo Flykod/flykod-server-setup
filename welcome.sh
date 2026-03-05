@@ -24,8 +24,10 @@ show_logo() {
 }
 
 show_greeting() {
-  echo "Welcome. This server is ready for a single WordPress site."
-  echo "Flykod: https://flykod.com/"
+  echo "Welcome."
+  echo "This server is set up for one WordPress site — use the menu below to get started."
+  echo ""
+  echo "  Powered by Flykod · https://flykod.com"
   echo ""
 }
 
@@ -89,7 +91,7 @@ show_info() {
     CURRENT=$(cat "$CURRENT_DOMAIN_FILE")
     echo "--- Domain / IP access ---"
     echo "  Domain: $CURRENT"
-    echo "  (IP also serves this site when using --dev)"
+    echo "  Domain not pointed yet — use the Public IP above to access the site."
     echo ""
   fi
   echo ""
