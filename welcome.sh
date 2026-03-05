@@ -33,6 +33,9 @@ show_greeting() {
   echo "This server is set up for one WordPress site — use the menu below to get started."
   echo ""
   echo "===================================================================================="
+  echo ""
+  echo ""
+  echo ""
 }
 
 check_stack() {
