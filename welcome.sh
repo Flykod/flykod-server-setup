@@ -65,7 +65,7 @@ show_checklist() {
   else
     echo "  [   ] - Create site"
   fi
-  if [ -f "$SITE_ROOT/wp-config.php" ]; then
+  if [ -f "$SITE_ROOT/wp-login.php" ] || [ -f "$SITE_ROOT/wp-config.php" ]; then
     echo "  [ ✓ ] - WordPress"
   else
     echo "  [   ] - WordPress"
@@ -78,7 +78,12 @@ show_info() {
   echo "Site root: $SITE_ROOT"
   echo ""
   echo "--- Server IP (use when domain is not pointed yet) ---"
-  ip -4 addr show scope global 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' || echo "Could not detect IP."
+  PUBLIC_IP=$(ip -4 addr show scope global 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -vE '^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\.|^192\.168\.' | head -1)
+  if [ -n "$PUBLIC_IP" ]; then
+    echo "  Public: $PUBLIC_IP"
+  else
+    echo "  Could not detect public IP."
+  fi
   echo ""
   if [ -f "$CURRENT_DOMAIN_FILE" ]; then
     CURRENT=$(cat "$CURRENT_DOMAIN_FILE")
