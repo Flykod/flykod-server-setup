@@ -72,15 +72,15 @@ show_checklist() {
   else
     echo "  [   ] - Firewall (UFW)"
   fi
-  if [ -f "$CURRENT_DOMAIN_FILE" ]; then
-    echo -e "  [ ${GREEN}✓${RESET} ] - Create site"
-  else
-    echo "  [   ] - Create site"
-  fi
   if [ -f "$CREDENTIALS_FILE" ]; then
     echo -e "  [ ${GREEN}✓${RESET} ] - Database (local)"
   else
     echo "  [   ] - Database (skip if using external DB)"
+  fi
+  if [ -f "$CURRENT_DOMAIN_FILE" ]; then
+    echo -e "  [ ${GREEN}✓${RESET} ] - Create site"
+  else
+    echo "  [   ] - Create site"
   fi
   if [ -f "$SITE_ROOT/wp-login.php" ] || [ -f "$SITE_ROOT/wp-config.php" ]; then
     echo -e "  [ ${GREEN}✓${RESET} ] - WordPress"
